@@ -96,8 +96,8 @@ whereis-my-command/
 - [x] GitHub Actions CI — smoke-tests /health on every push to main
 
 ### Phase 6 — Polish
-- [ ] README with examples and screenshots
-- [ ] Documentation
+- [x] README with examples and screenshots
+- [x] CI badge
 - [ ] Add to rick-does org-readme and resume
 
 ---
