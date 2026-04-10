@@ -67,13 +67,8 @@ def health():
 @app.get("/stats")
 def stats():
     try:
-        import chromadb
-        from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
-        from rag import CHROMA_DIR, COLLECTION_NAME, EMBEDDING_MODEL
-        ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
-        chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
-        return {"pages": collection.count()}
+        from rag import _collection
+        return {"pages": _collection.count()}
     except Exception:
         return {"pages": None}
 

@@ -45,21 +45,23 @@ PROMPT = ChatPromptTemplate.from_template(
 )
 
 
+_ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
+_chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+try:
+    _collection = _chroma.get_collection(COLLECTION_NAME, embedding_function=_ef)
+except Exception:
+    raise RuntimeError(
+        "Corpus not found. Run ingest/ingest.py before starting the backend."
+    )
+
+
 def query(user_query: str) -> dict:
-    ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
-    chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    try:
-        collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
-    except Exception:
-        raise RuntimeError(
-            "Corpus not found. Run ingest/ingest.py before starting the backend."
-        )
 
     llm = ChatGoogleGenerativeAI(model=LLM_MODEL)
     rewritten = (REWRITE_PROMPT | llm).invoke({"query": user_query})
     search_query = rewritten.content.strip() if rewritten.content else user_query
 
-    results = collection.query(query_texts=[search_query], n_results=TOP_K)
+    results = _collection.query(query_texts=[search_query], n_results=TOP_K)
     sections = []
     for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
         sections.append(f"[platform: {meta['platform']}]\n{doc}")

@@ -3,5 +3,5 @@ sentence-transformers
 langchain
 langchain-core
 langchain-google-genai
-fastapi
+fastapi[standard]
 uvicorn
