@@ -51,7 +51,7 @@ def embed_and_store(docs):
 
     try:
         chroma.delete_collection(COLLECTION_NAME)
-    except Exception:
+    except ValueError:
         pass
     collection = chroma.create_collection(COLLECTION_NAME, embedding_function=ef)
 

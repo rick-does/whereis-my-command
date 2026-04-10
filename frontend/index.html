@@ -203,7 +203,7 @@
 
   <div id="result"></div>
 
-  <p class="corpus-note">Natural language search across <a href="https://tldr.sh" target="_blank">tldr-pages</a> CLI documentation. &nbsp;·&nbsp; <a href="https://github.com/rick-does/whereis-my-command/issues" target="_blank">Feedback / issues</a></p>
+  <p class="corpus-note">Natural language search across <a href="https://tldr.sh" target="_blank" rel="noopener noreferrer">tldr-pages</a> CLI documentation. &nbsp;·&nbsp; <a href="https://github.com/rick-does/whereis-my-command/issues" target="_blank" rel="noopener noreferrer">Feedback / issues</a></p>
 
   <script>
     const input = document.getElementById("query");
@@ -259,7 +259,7 @@
               <button class="copy-btn" onclick="copyCard(this)">Copy</button>
             </div>
             <p class="explanation">${escHtml(r.explanation)}</p>
-            <p class="source">Source: <a href="https://tldr.sh/" target="_blank">${escHtml(r.source)}</a> via <a href="https://tldr.sh" target="_blank">tldr-pages</a></p>
+            <p class="source">Source: <a href="https://tldr.sh/" target="_blank" rel="noopener noreferrer">${escHtml(r.source)}</a> via <a href="https://tldr.sh" target="_blank" rel="noopener noreferrer">tldr-pages</a></p>
           `;
           resultEl.appendChild(card);
         });
@@ -283,11 +283,15 @@
         btn.style.background = "#38bdf8";
         btn.style.color = "#0f1117";
         setTimeout(() => { btn.style.background = ""; btn.style.color = ""; }, 750);
+      }).catch(() => {
+        btn.style.background = "#f87171";
+        btn.style.color = "#0f1117";
+        setTimeout(() => { btn.style.background = ""; btn.style.color = ""; }, 750);
       });
     }
 
     function escHtml(str) {
-      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
     }
   </script>
 </body>

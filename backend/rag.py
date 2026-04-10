@@ -48,11 +48,16 @@ PROMPT = ChatPromptTemplate.from_template(
 def query(user_query: str) -> dict:
     ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
     chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
+    try:
+        collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
+    except Exception:
+        raise RuntimeError(
+            "Corpus not found. Run ingest/ingest.py before starting the backend."
+        )
 
     llm = ChatGoogleGenerativeAI(model=LLM_MODEL)
     rewritten = (REWRITE_PROMPT | llm).invoke({"query": user_query})
-    search_query = rewritten.content.strip()
+    search_query = rewritten.content.strip() if rewritten.content else user_query
 
     results = collection.query(query_texts=[search_query], n_results=TOP_K)
     sections = []

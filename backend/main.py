@@ -19,13 +19,22 @@ app = FastAPI(title="whereis <my-command>")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 _request_log: dict[str, list[float]] = defaultdict(list)
+_last_cleanup = time.time()
+_CLEANUP_INTERVAL = 300
 
 
 def _check_rate_limit(ip: str):
+    global _last_cleanup
     now = time.time()
     window_start = now - RATE_WINDOW
-    timestamps = _request_log[ip]
-    _request_log[ip] = [t for t in timestamps if t > window_start]
+
+    if now - _last_cleanup > _CLEANUP_INTERVAL:
+        stale = [k for k, v in _request_log.items() if not any(t > window_start for t in v)]
+        for k in stale:
+            del _request_log[k]
+        _last_cleanup = now
+
+    _request_log[ip] = [t for t in _request_log[ip] if t > window_start]
     if len(_request_log[ip]) >= RATE_LIMIT:
         raise HTTPException(status_code=429, detail="Rate limit exceeded. Try again in a minute.")
     _request_log[ip].append(now)
@@ -57,7 +66,7 @@ def health():
 
 @app.post("/query", response_model=QueryResponse)
 def query(request: Request, body: QueryRequest):
-    ip = request.client.host
+    ip = request.client.host if request.client else "unknown"
     _check_rate_limit(ip)
 
     if not body.query or not body.query.strip():
