@@ -19,7 +19,7 @@ Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) 
 
 ## Status
 
-Working locally. Deployment coming soon.
+Live at **https://container-service-1.gqceswqwzkchr.us-west-2.cs.amazonlightsail.com**
 
 ---
 
