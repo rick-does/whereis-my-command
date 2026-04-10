@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from rag import query as rag_query
+rag_query = None
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
@@ -81,6 +81,9 @@ def query(request: Request, body: QueryRequest):
     if not body.query or not body.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
+    global rag_query
+    if rag_query is None:
+        from rag import query as rag_query
     result = rag_query(body.query.strip())
 
     if not result.get("results"):
