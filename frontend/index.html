@@ -9,7 +9,7 @@
 
     body {
       font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
-      background: #0f1117;
+      background: #000000;
       color: #e2e8f0;
       min-height: 100vh;
       display: flex;
@@ -26,7 +26,7 @@
     h1 {
       font-size: 2rem;
       font-weight: 700;
-      color: #38bdf8;
+      color: #d74726;
       letter-spacing: -0.5px;
     }
 
@@ -59,13 +59,13 @@
       transition: border-color 0.15s;
     }
 
-    input:focus { border-color: #38bdf8; }
+    input:focus { border-color: #d74726; }
     input::placeholder { color: #94a3b8; }
 
     button {
       padding: 0.75rem 1.25rem;
-      background: #38bdf8;
-      color: #0f1117;
+      background: #d74726;
+      color: #000000;
       border: none;
       border-radius: 6px;
       font-family: inherit;
@@ -76,10 +76,10 @@
       white-space: nowrap;
     }
 
-    button:hover { background: #7dd3fc; }
+    button:hover { background: #e8633f; }
     button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-    button.stop { background: #f87171; color: #0f1117; }
-    button.stop:hover { background: #fca5a5; }
+    button.stop { background: #c8c8c8; color: #000000; }
+    button.stop:hover { background: #e0e0e0; }
 
     #result {
       width: 100%;
@@ -90,7 +90,7 @@
     }
 
     .card {
-      background: #1e2433;
+      background: #1a1a1a;
       border: 1px solid #334155;
       border-radius: 8px;
       padding: 1.25rem 1.5rem;
@@ -107,14 +107,14 @@
     code {
       font-family: inherit;
       font-size: 1rem;
-      color: #38bdf8;
+      color: #d74726;
       word-break: break-all;
     }
 
     .copy-btn {
       padding: 0.3rem 0.7rem;
       font-size: 0.8rem;
-      background: #0f1117;
+      background: #000000;
       color: #94a3b8;
       border: 1px solid #334155;
       border-radius: 4px;
@@ -136,7 +136,7 @@
       color: #475569;
     }
 
-    .source a { color: #38bdf8; text-decoration: none; }
+    .source a { color: #d74726; text-decoration: none; }
     .source a:hover { text-decoration: underline; }
 
     .hint {
@@ -176,7 +176,7 @@
       width: 18px;
       height: 18px;
       border: 2px solid #334155;
-      border-top-color: #38bdf8;
+      border-top-color: #d74726;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       position: absolute;
@@ -293,12 +293,12 @@
     function copyCard(btn) {
       const cmd = btn.closest(".card").querySelector("code").dataset.raw || "";
       navigator.clipboard.writeText(cmd).then(() => {
-        btn.style.background = "#38bdf8";
-        btn.style.color = "#0f1117";
+        btn.style.background = "#d74726";
+        btn.style.color = "#000000";
         setTimeout(() => { btn.style.background = ""; btn.style.color = ""; }, 750);
       }).catch(() => {
-        btn.style.background = "#f87171";
-        btn.style.color = "#0f1117";
+        btn.style.background = "#fbbf24";
+        btn.style.color = "#000000";
         setTimeout(() => { btn.style.background = ""; btn.style.color = ""; }, 750);
       });
     }

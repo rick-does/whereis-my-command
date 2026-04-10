@@ -2,19 +2,16 @@
 
 Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) CLI documentation.
 
-You describe what you want to do. You get the command.
+It's a fast, grounded, no-noise lookup tool for developers who want an answer they can trust and paste directly.
 
 ---
 
-## What it does
+## What it does better
 
-Developers and sysadmins know what they want to accomplish but can't always remember
-which tool or flag does it. `whereis <my-command>` lets you ask in plain English and
-returns the right command with a plain-English explanation.
-
-Queries return 3–5 ranked results, from most common to most specialized, so both the
-standard answer and the edge cases surface. Queries are rewritten into technical search
-terms before retrieval to improve accuracy.
+1. **No hallucination on commands** — every answer is grounded in [tldr-pages](https://github.com/tldr-pages/tldr) documentation, so the commands are real and tested
+2. **Structured, consistent output** — always a command, an explanation, and a source; no conversational filler
+3. **Ranked alternatives** — 3–5 results ordered by commonality, from the standard answer to the edge cases
+4. **No context needed** — one input, one output; closer to a CLI tool itself in spirit
 
 **Example queries:**
 
