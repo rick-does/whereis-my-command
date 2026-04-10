@@ -11,19 +11,24 @@ CHROMA_DIR = DATA_DIR / "chroma"
 COLLECTION_NAME = "tldr"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 LLM_MODEL = "gemini-2.5-flash"
-TOP_K = 5
+TOP_K = 10
 
 PROMPT = ChatPromptTemplate.from_template(
     "You are a CLI command assistant. A user wants to accomplish something on the "
     "command line but doesn't know the exact command.\n\n"
-    "Given the user's goal and relevant CLI documentation pages, identify the best "
-    "command and explain how to use it.\n\n"
+    "Given the user's goal and relevant CLI documentation pages, return 3 to 5 of the "
+    "best commands, ranked from most to least commonly used. Prefer commands from the "
+    "'common' or 'linux' platforms unless the user's goal explicitly mentions a "
+    "different platform (e.g. Windows, macOS, Android). Include well-known standard "
+    "tools before obscure ones.\n\n"
     "User's goal: {query}\n\n"
     "Relevant documentation:\n{context}\n\n"
-    "Respond in this exact format:\n"
-    "Command: <the command, with typical flags if helpful>\n"
+    "Respond with 3 to 5 results in this exact format, repeating the block for each:\n"
+    "Result:\n"
+    "Command: <the command, with typical flags if helpful — replace any {{placeholder}} "
+    "syntax with a realistic concrete example>\n"
     "Explanation: <plain English explanation of what it does>\n"
-    "Source: <command name>"
+    "Source: <command name>\n"
 )
 
 
@@ -33,26 +38,61 @@ def query(user_query: str) -> dict:
     collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
 
     results = collection.query(query_texts=[user_query], n_results=TOP_K)
-    context = "\n\n---\n\n".join(results["documents"][0])
+    sections = []
+    for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+        sections.append(f"[platform: {meta['platform']}]\n{doc}")
+    context = "\n\n---\n\n".join(sections)
 
     llm = ChatGoogleGenerativeAI(model=LLM_MODEL)
     response = (PROMPT | llm).invoke({"query": user_query, "context": context})
 
-    result = {"query": user_query, "raw": response.content}
-    for line in response.content.splitlines():
-        if line.startswith("Command:"):
-            result["command"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Explanation:"):
-            result["explanation"] = line.split(":", 1)[1].strip()
-        elif line.startswith("Source:"):
-            result["source"] = line.split(":", 1)[1].strip()
+    results = []
+    current: dict = {}
+    current_key = None
+    current_lines: list = []
 
-    return result
+    def _flush_key():
+        if current_key and current_lines:
+            current[current_key] = "\n".join(current_lines).strip()
+
+    def _flush_result():
+        _flush_key()
+        if current:
+            if "command" in current:
+                current["command"] = " ".join(current["command"].splitlines()).strip()
+            results.append(current.copy())
+            current.clear()
+
+    for line in response.content.splitlines():
+        if line.strip() == "Result:":
+            _flush_result()
+            current_key = None
+            current_lines = []
+        elif line.startswith("Command:"):
+            _flush_key()
+            current_key = "command"
+            current_lines = [line.split(":", 1)[1].strip()]
+        elif line.startswith("Explanation:"):
+            _flush_key()
+            current_key = "explanation"
+            current_lines = [line.split(":", 1)[1].strip()]
+        elif line.startswith("Source:"):
+            _flush_key()
+            current_key = "source"
+            current_lines = [line.split(":", 1)[1].strip()]
+        elif current_key:
+            current_lines.append(line)
+
+    _flush_result()
+
+    return {"query": user_query, "raw": response.content, "results": results}
 
 
 if __name__ == "__main__":
     q = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "recursively find files modified in the last 24 hours"
     result = query(q)
-    print(f"Command:     {result.get('command', 'N/A')}")
-    print(f"Explanation: {result.get('explanation', 'N/A')}")
-    print(f"Source:      {result.get('source', 'N/A')}")
+    for i, r in enumerate(result.get("results", []), 1):
+        print(f"\n--- Result {i} ---")
+        print(f"Command:     {r.get('command', 'N/A')}")
+        print(f"Explanation: {r.get('explanation', 'N/A')}")
+        print(f"Source:      {r.get('source', 'N/A')}")

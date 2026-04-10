@@ -1,16 +1,22 @@
 import os
 import time
 from collections import defaultdict
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from rag import query as rag_query
+
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
 RATE_LIMIT = int(os.getenv("RATE_LIMIT", "20"))
 RATE_WINDOW = 60
 
 app = FastAPI(title="whereis <my-command>")
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 _request_log: dict[str, list[float]] = defaultdict(list)
 
@@ -29,10 +35,19 @@ class QueryRequest(BaseModel):
     query: str
 
 
-class QueryResponse(BaseModel):
+class CommandResult(BaseModel):
     command: str
     explanation: str
     source: str
+
+
+class QueryResponse(BaseModel):
+    results: list[CommandResult]
+
+
+@app.get("/")
+def index():
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/health")
@@ -50,11 +65,16 @@ def query(request: Request, body: QueryRequest):
 
     result = rag_query(body.query.strip())
 
-    if "command" not in result or "explanation" not in result:
+    if not result.get("results"):
         raise HTTPException(status_code=500, detail="Failed to generate a result.")
 
     return QueryResponse(
-        command=result["command"],
-        explanation=result["explanation"],
-        source=result.get("source", ""),
+        results=[
+            CommandResult(
+                command=r.get("command", ""),
+                explanation=r.get("explanation", ""),
+                source=r.get("source", ""),
+            )
+            for r in result["results"]
+        ]
     )
