@@ -1,6 +1,6 @@
 # whereis \<my-command\>
 
-Natural language search across CLI documentation.
+Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) CLI documentation.
 
 You describe what you want to do. You get the command.
 
