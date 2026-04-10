@@ -150,6 +150,10 @@
     .hint em { font-style: normal; color: #94a3b8; }
 
     .corpus-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
       width: 100%;
       max-width: 640px;
       font-size: 0.8rem;
@@ -157,7 +161,7 @@
       margin-top: 1.5rem;
     }
 
-    .corpus-note a { color: #94a3b8; text-decoration: underline; }
+    .corpus-note a { color: #94a3b8; text-decoration: underline; white-space: nowrap; }
     .corpus-note a:hover { color: #cbd5e1; }
 
     #error {
@@ -197,13 +201,16 @@
     <div class="spinner" id="spinner"></div>
   </div>
 
-  <p class="hint">Defaults to Linux / common commands. Add <em>on macOS</em>, <em>on Windows</em>, <em>on Android</em>, etc. to target a specific platform.</p>
+  <p class="hint">Defaults to Linux / common commands. Add <em>on macOS</em>, <em>on Windows</em>, <em>on Android</em>, etc. to target a specific platform</p>
 
   <div id="error"></div>
 
   <div id="result"></div>
 
-  <p class="corpus-note">Natural language search across <a href="https://tldr.sh" target="_blank" rel="noopener noreferrer">tldr-pages</a> CLI documentation. &nbsp;·&nbsp; <a href="https://github.com/rick-does/whereis-my-command/issues" target="_blank" rel="noopener noreferrer">Feedback / issues</a></p>
+  <div class="corpus-note">
+    <span>Search <a href="https://tldr.sh" target="_blank" rel="noopener noreferrer">tldr-pages</a> CLI docs<span id="page-count"></span></span>
+    <a href="https://github.com/rick-does/whereis-my-command/issues" target="_blank" rel="noopener noreferrer">Feedback / issues</a>
+  </div>
 
   <script>
     const input = document.getElementById("query");
@@ -211,6 +218,12 @@
 
     const submitBtn = document.getElementById("submit-btn");
     submitBtn.style.width = submitBtn.offsetWidth + "px";
+
+    fetch("/stats").then(r => r.json()).then(data => {
+      if (data.pages) {
+        document.getElementById("page-count").textContent = ` (${data.pages.toLocaleString()} pages)`;
+      }
+    }).catch(() => {});
 
     let controller = null;
 

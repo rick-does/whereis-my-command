@@ -64,6 +64,20 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/stats")
+def stats():
+    try:
+        import chromadb
+        from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+        from rag import CHROMA_DIR, COLLECTION_NAME, EMBEDDING_MODEL
+        ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
+        chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
+        return {"pages": collection.count()}
+    except Exception:
+        return {"pages": None}
+
+
 @app.post("/query", response_model=QueryResponse)
 def query(request: Request, body: QueryRequest):
     ip = request.client.host if request.client else "unknown"

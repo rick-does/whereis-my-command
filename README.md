@@ -13,7 +13,8 @@ which tool or flag does it. `whereis <my-command>` lets you ask in plain English
 returns the right command with a plain-English explanation.
 
 Queries return 3–5 ranked results, from most common to most specialized, so both the
-standard answer and the edge cases surface.
+standard answer and the edge cases surface. Queries are rewritten into technical search
+terms before retrieval to improve accuracy.
 
 **Example queries:**
 
