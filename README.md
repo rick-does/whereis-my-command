@@ -18,7 +18,7 @@ returns the right command with a plain-English explanation.
 - _"watch a log file and filter for errors"_
 - _"list open ports on this machine"_
 
-Powered by [tldr-pages](https://github.com/tldr-pages/tldr), OpenAI embeddings, and a RAG pipeline.
+Powered by [tldr-pages](https://github.com/tldr-pages/tldr), sentence-transformers, and a RAG pipeline.
 
 ---
 
@@ -31,7 +31,7 @@ Under construction.
 ## Stack
 
 - **Corpus:** tldr-pages (~3,000 commands, MIT licensed)
-- **Embeddings:** OpenAI `text-embedding-3-small`
+- **Embeddings:** sentence-transformers (`all-MiniLM-L6-v2`)
 - **Vector store:** Chroma
 - **RAG:** LangChain
 - **Backend:** FastAPI

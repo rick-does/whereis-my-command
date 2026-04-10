@@ -1,16 +1,15 @@
-import os
 import subprocess
 from pathlib import Path
 
 import chromadb
-from openai import OpenAI
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 TLDR_REPO = "https://github.com/tldr-pages/tldr.git"
 DATA_DIR = Path(__file__).parent.parent / "data"
 TLDR_DIR = DATA_DIR / "tldr-pages"
 CHROMA_DIR = DATA_DIR / "chroma"
 COLLECTION_NAME = "tldr"
-EMBEDDING_MODEL = "text-embedding-3-small"
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 BATCH_SIZE = 100
 
 
@@ -47,25 +46,21 @@ def load_pages():
 
 
 def embed_and_store(docs):
-    client = OpenAI()
+    ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
     chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
 
     try:
         chroma.delete_collection(COLLECTION_NAME)
     except Exception:
         pass
-    collection = chroma.create_collection(COLLECTION_NAME)
+    collection = chroma.create_collection(COLLECTION_NAME, embedding_function=ef)
 
     print(f"Embedding {len(docs)} documents...")
     for i in range(0, len(docs), BATCH_SIZE):
         batch = docs[i : i + BATCH_SIZE]
-        texts = [d["text"] for d in batch]
-        response = client.embeddings.create(input=texts, model=EMBEDDING_MODEL)
-        embeddings = [e.embedding for e in response.data]
         collection.add(
             ids=[d["id"] for d in batch],
-            embeddings=embeddings,
-            documents=texts,
+            documents=[d["text"] for d in batch],
             metadatas=[d["metadata"] for d in batch],
         )
         print(f"  {min(i + BATCH_SIZE, len(docs))}/{len(docs)}")
@@ -74,13 +69,11 @@ def embed_and_store(docs):
 
 
 def verify(query="list files in a directory"):
-    client = OpenAI()
+    ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
     chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = chroma.get_collection(COLLECTION_NAME)
+    collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
 
-    response = client.embeddings.create(input=[query], model=EMBEDDING_MODEL)
-    embedding = response.data[0].embedding
-    results = collection.query(query_embeddings=[embedding], n_results=3)
+    results = collection.query(query_texts=[query], n_results=3)
 
     print(f"\nVerification query: '{query}'")
     for i, (doc_id, doc) in enumerate(zip(results["ids"][0], results["documents"][0])):

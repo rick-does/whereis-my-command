@@ -32,7 +32,7 @@ command, you're the target user.
 - One-time ingest; incremental updates by diffing against the tldr-pages repo
 
 ### Stack
-- **Embeddings:** OpenAI `text-embedding-3-small` (cheap) or sentence-transformers (free/local)
+- **Embeddings:** sentence-transformers `all-MiniLM-L6-v2` (free/local)
 - **Vector store:** Chroma for development; design the abstraction layer so it can be swapped to Pinecone/Weaviate for production scale-up without rewriting the query pipeline
 - **RAG layer:** LangChain
 - **Backend:** FastAPI
