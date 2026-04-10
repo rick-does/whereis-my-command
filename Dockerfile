@@ -21,7 +21,6 @@ RUN python -m venv backend/.venv \
 COPY frontend/ frontend/
 
 COPY --from=corpus-build /build/data/chroma/ data/chroma/
-COPY --from=corpus-build /root/.cache/ /root/.cache/
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
