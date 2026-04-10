@@ -1,5 +1,7 @@
 # whereis \<my-command\>
 
+![whereis my-command](docs/screenshot.png)
+
 Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) CLI documentation.
 
 1. **No hallucination on commands** — every answer is grounded in tldr-pages documentation, so the commands are real and tested
