@@ -1,8 +1,8 @@
 # whereis \<my-command\>
 
-![whereis my-command](docs/screenshot.png)
-
 [![CI](https://github.com/rick-does/whereis-my-command/actions/workflows/ci.yml/badge.svg)](https://github.com/rick-does/whereis-my-command/actions/workflows/ci.yml)
+
+![whereis my-command](docs/screenshot.png)
 
 Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) CLI documentation.
 
