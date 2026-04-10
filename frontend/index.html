@@ -78,6 +78,8 @@
 
     button:hover { background: #7dd3fc; }
     button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    button.stop { background: #f87171; color: #0f1117; }
+    button.stop:hover { background: #fca5a5; }
 
     #result {
       width: 100%;
@@ -147,6 +149,17 @@
 
     .hint em { font-style: normal; color: #94a3b8; }
 
+    .corpus-note {
+      width: 100%;
+      max-width: 640px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 1.5rem;
+    }
+
+    .corpus-note a { color: #94a3b8; text-decoration: underline; }
+    .corpus-note a:hover { color: #cbd5e1; }
+
     #error {
       width: 100%;
       max-width: 640px;
@@ -190,9 +203,20 @@
 
   <div id="result"></div>
 
+  <p class="corpus-note">Natural language search across <a href="https://tldr.sh" target="_blank">tldr-pages</a> CLI documentation. &nbsp;·&nbsp; <a href="https://github.com/rick-does/whereis-my-command/issues" target="_blank">Feedback / issues</a></p>
+
   <script>
     const input = document.getElementById("query");
     input.addEventListener("keydown", e => { if (e.key === "Enter") search(); });
+
+    const submitBtn = document.getElementById("submit-btn");
+    submitBtn.style.width = submitBtn.offsetWidth + "px";
+
+    let controller = null;
+
+    function stopSearch() {
+      if (controller) controller.abort();
+    }
 
     async function search() {
       const q = input.value.trim();
@@ -203,7 +227,10 @@
       const errorEl = document.getElementById("error");
       const resultEl = document.getElementById("result");
 
-      btn.disabled = true;
+      controller = new AbortController();
+      btn.textContent = "Stop";
+      btn.classList.add("stop");
+      btn.onclick = stopSearch;
       spinner.style.display = "block";
       errorEl.style.display = "none";
       resultEl.innerHTML = "";
@@ -213,6 +240,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: q }),
+          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -222,7 +250,7 @@
 
         const data = await res.json();
         resultEl.innerHTML = "";
-        data.results.forEach((r, i) => {
+        data.results.forEach((r) => {
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
@@ -236,10 +264,15 @@
           resultEl.appendChild(card);
         });
       } catch (err) {
-        errorEl.textContent = err.message;
-        errorEl.style.display = "block";
+        if (err.name !== "AbortError") {
+          errorEl.textContent = err.message;
+          errorEl.style.display = "block";
+        }
       } finally {
-        btn.disabled = false;
+        controller = null;
+        btn.textContent = "Search";
+        btn.classList.remove("stop");
+        btn.onclick = search;
         spinner.style.display = "none";
       }
     }

@@ -13,6 +13,14 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 LLM_MODEL = "gemini-2.5-flash"
 TOP_K = 10
 
+REWRITE_PROMPT = ChatPromptTemplate.from_template(
+    "Convert the following natural language goal into concise technical search terms "
+    "that would appear in CLI command documentation. Focus on the operation type, "
+    "tool category, and technical parameters — not the human-friendly phrasing.\n\n"
+    "Goal: {query}\n\n"
+    "Technical search terms (one line, no explanation):"
+)
+
 PROMPT = ChatPromptTemplate.from_template(
     "You are a CLI command assistant. A user wants to accomplish something on the "
     "command line but doesn't know the exact command.\n\n"
@@ -21,6 +29,11 @@ PROMPT = ChatPromptTemplate.from_template(
     "'common' or 'linux' platforms unless the user's goal explicitly mentions a "
     "different platform (e.g. Windows, macOS, Android). Include well-known standard "
     "tools before obscure ones.\n\n"
+    "Before selecting commands, evaluate whether each documentation page actually "
+    "addresses the user's goal. Discard any results that only match on incidental "
+    "phrasing rather than the actual task — for example, if the user asks about "
+    "filesystem operations, do not return version control commands (git, svn) just "
+    "because they mention a similar timeframe or keyword.\n\n"
     "User's goal: {query}\n\n"
     "Relevant documentation:\n{context}\n\n"
     "Respond with 3 to 5 results in this exact format, repeating the block for each:\n"
@@ -37,13 +50,16 @@ def query(user_query: str) -> dict:
     chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
     collection = chroma.get_collection(COLLECTION_NAME, embedding_function=ef)
 
-    results = collection.query(query_texts=[user_query], n_results=TOP_K)
+    llm = ChatGoogleGenerativeAI(model=LLM_MODEL)
+    rewritten = (REWRITE_PROMPT | llm).invoke({"query": user_query})
+    search_query = rewritten.content.strip()
+
+    results = collection.query(query_texts=[search_query], n_results=TOP_K)
     sections = []
     for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
         sections.append(f"[platform: {meta['platform']}]\n{doc}")
     context = "\n\n---\n\n".join(sections)
 
-    llm = ChatGoogleGenerativeAI(model=LLM_MODEL)
     response = (PROMPT | llm).invoke({"query": user_query, "context": context})
 
     results = []
