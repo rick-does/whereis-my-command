@@ -1,4 +1,5 @@
 import os
+import threading
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -16,6 +17,18 @@ RATE_LIMIT = int(os.getenv("RATE_LIMIT", "20"))
 RATE_WINDOW = 60
 
 app = FastAPI(title="whereis <my-command>")
+
+
+def _preload_rag():
+    global rag_query
+    try:
+        from rag import query as _q
+        rag_query = _q
+    except Exception:
+        pass
+
+
+threading.Thread(target=_preload_rag, daemon=True).start()
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 _request_log: dict[str, list[float]] = defaultdict(list)
