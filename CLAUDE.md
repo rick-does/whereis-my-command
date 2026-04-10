@@ -80,9 +80,8 @@ whereis-my-command/
 
 ### Phase 3 — Backend
 - [ ] FastAPI app with `/query` endpoint
-- [ ] API key middleware (wired in, keys free for now)
 - [ ] `/health` endpoint
-- [ ] Rate limiting
+- [ ] Rate limiting (per IP for now; API key middleware deferred until traffic warrants it)
 
 ### Phase 4 — Frontend
 - [ ] Simple web UI: text input, results display
