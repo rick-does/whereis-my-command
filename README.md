@@ -2,13 +2,7 @@
 
 Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) CLI documentation.
 
-It's a fast, grounded, no-noise lookup tool for developers who want an answer they can trust and paste directly.
-
----
-
-## What it does better
-
-1. **No hallucination on commands** — every answer is grounded in [tldr-pages](https://github.com/tldr-pages/tldr) documentation, so the commands are real and tested
+1. **No hallucination on commands** — every answer is grounded in tldr-pages documentation, so the commands are real and tested
 2. **Structured, consistent output** — always a command, an explanation, and a source; no conversational filler
 3. **Ranked alternatives** — 3–5 results ordered by commonality, from the standard answer to the edge cases
 4. **No context needed** — one input, one output; closer to a CLI tool itself in spirit
@@ -20,11 +14,6 @@ It's a fast, grounded, no-noise lookup tool for developers who want an answer th
 - _"list open ports on this machine"_
 - _"copy files over SSH"_
 - _"show disk usage sorted by size"_
-
-Defaults to Linux/common commands. Add _on macOS_, _on Windows_, _on Android_, etc.
-to target a specific platform.
-
-Powered by [tldr-pages](https://github.com/tldr-pages/tldr), sentence-transformers, and a RAG pipeline.
 
 ---
 
