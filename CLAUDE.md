@@ -90,10 +90,10 @@ whereis-my-command/
 - [x] Returns 3-5 ranked results per query
 - [x] Per-result Copy button
 
-### Phase 5 — Deploy
-- [ ] Dockerfile — stateless container, Chroma baked in at build time for now
-- [ ] Deploy to Lightsail container
-- [ ] GitHub Actions CI
+### Phase 5 — Deploy ✓
+- [x] Dockerfile — multi-stage build; Chroma + model cache baked in at build time
+- [x] Deploy to Lightsail container (container-service-1, Micro, us-west-2)
+- [x] GitHub Actions CI — smoke-tests /health on every push to main
 
 ### Phase 6 — Polish
 - [ ] README with examples and screenshots
