@@ -98,7 +98,7 @@ whereis-my-command/
 ### Phase 6 — Polish
 - [x] README with examples and screenshots
 - [x] CI badge
-- [ ] Add to rick-does org-readme and resume
+- [x] Add to rick-does org-readme and resume
 
 ---
 
