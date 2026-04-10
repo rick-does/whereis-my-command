@@ -5,7 +5,7 @@ Natural language search across [tldr-pages](https://github.com/tldr-pages/tldr) 
 1. **No hallucination on commands** — every answer is grounded in tldr-pages documentation, so the commands are real and tested
 2. **Structured, consistent output** — always a command, an explanation, and a source; no conversational filler
 3. **Ranked alternatives** — 3–5 results ordered by commonality, from the standard answer to the edge cases
-4. **No context needed** — one input, one output; closer to a CLI tool itself in spirit
+4. **No context needed** — one input, one output
 
 **Example queries:**
 
