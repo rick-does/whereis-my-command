@@ -27,16 +27,16 @@ command, you're the target user.
 
 ### Corpus
 - **Source:** tldr-pages (`tldr-pages/tldr` on GitHub) — MIT licensed, community-maintained
-- ~3,000-4,000 command files, each 200-400 tokens
+- ~7,000 pages (pages/ directory only, English)
 - Clean, consistent format: short description + practical examples per command
 - One-time ingest; incremental updates by diffing against the tldr-pages repo
 
 ### Stack
-- **Embeddings:** sentence-transformers `all-MiniLM-L6-v2` (free/local)
+- **Embeddings:** sentence-transformers `all-MiniLM-L6-v2` (free/local, no API key)
 - **Vector store:** Chroma for development; design the abstraction layer so it can be swapped to Pinecone/Weaviate for production scale-up without rewriting the query pipeline
-- **RAG layer:** LangChain
+- **RAG layer:** LangChain + Gemini 2.5 Flash (requires `GOOGLE_API_KEY`)
 - **Backend:** FastAPI
-- **Frontend:** Simple React or plain HTML — function over form
+- **Frontend:** Vanilla HTML/JS — function over form
 - **Deployment:** Lightsail container (same pattern as md-tree demo)
 
 ### Scalability considerations
@@ -68,24 +68,27 @@ whereis-my-command/
 
 ## TODO
 
-### Phase 1 — Ingest
-- [ ] Clone tldr-pages repo
-- [ ] Write ingest script: walk files, chunk, embed, store in Chroma
-- [ ] Verify corpus is queryable
+### Phase 1 — Ingest ✓
+- [x] Clone tldr-pages repo
+- [x] Write ingest script: walk files, chunk, embed, store in Chroma
+- [x] Verify corpus is queryable
 
-### Phase 2 — RAG layer
-- [ ] LangChain query pipeline
-- [ ] Prompt engineering: natural language in → command + explanation out
-- [ ] Test with representative queries
+### Phase 2 — RAG layer ✓
+- [x] LangChain query pipeline
+- [x] Prompt engineering: natural language in → 3-5 ranked commands + explanations out
+- [x] Prefer common/linux platform; pass platform metadata to LLM
+- [x] Test with representative queries
 
-### Phase 3 — Backend
-- [ ] FastAPI app with `/query` endpoint
-- [ ] `/health` endpoint
-- [ ] Rate limiting (per IP for now; API key middleware deferred until traffic warrants it)
+### Phase 3 — Backend ✓
+- [x] FastAPI app with `/query` endpoint
+- [x] `/health` endpoint
+- [x] Rate limiting (per IP; API key middleware deferred until traffic warrants it)
 
-### Phase 4 — Frontend
-- [ ] Simple web UI: text input, results display
-- [ ] Show command, explanation, and source (tldr-pages attribution)
+### Phase 4 — Frontend ✓
+- [x] Simple web UI: text input, results display
+- [x] Show command, explanation, and source (tldr-pages attribution)
+- [x] Returns 3-5 ranked results per query
+- [x] Per-result Copy button
 
 ### Phase 5 — Deploy
 - [ ] Dockerfile — stateless container, Chroma baked in at build time for now
